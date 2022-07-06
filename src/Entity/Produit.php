@@ -28,7 +28,7 @@ class Produit
     private $description;
 
     /**
-     * @ORM\Column(type="string", length=20)
+     * @ORM\Column(type="string", length=40)
      */
     private $color;
 
@@ -38,7 +38,7 @@ class Produit
     private $size;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="string", length=5)
      */
     private $price;
 
@@ -60,13 +60,17 @@ class Produit
     /**
      * @ORM\Column(type="datetime")
      */
-    private $updateAt;
+    private $updatedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $deletedAt;
 
+    /**
+     * @ORM\Column(type="string", length=10)
+     */
+    private $collection;
 
     public function getId(): ?int
     {
@@ -169,14 +173,14 @@ class Produit
         return $this;
     }
 
-    public function getUpdateAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        return $this->updateAt;
+        return $this->updatedAt;
     }
 
-    public function setUpdateAt(\DateTimeInterface $updateAt): self
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
-        $this->updateAt = $updateAt;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -186,9 +190,21 @@ class Produit
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(\DateTimeInterface $deletedAt): self
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function getCollection(): ?string
+    {
+        return $this->collection;
+    }
+
+    public function setCollection(string $collection): self
+    {
+        $this->collection = $collection;
 
         return $this;
     }
