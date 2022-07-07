@@ -4,13 +4,14 @@ namespace App\Form;
 
 use App\Entity\Produit;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProduitFormType extends AbstractType
 {
@@ -64,10 +65,18 @@ class ProduitFormType extends AbstractType
             ])
             ->add('photo', FileType::class, [
                 'label' => "Photo du produit",
-                //                'data_class' => null,
+                'data_class' => null,
+                'constraints' => [
+                    new Image([
+                        'mimeTypes' => ['image/jpeg', 'image/png'],
+                        'mimeTypesMessage' => 'Les formats autorisés sont .jpg ou .png',
+                        'maxSize' => '3M',
+                        'maxSizeMessage' => 'Le poids maximal du fichier est : {{ limit }} {{ suffix }} ({{ name }}: {{ size }} {{ suffix }})',
+                    ])
+                ]
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Ajouter',
+                'label' => $options['photo'] ? 'Modifier' : 'Ajouter',
                 'validate' => false,
                 'attr' => [
                     'class' => 'd-block mx-auto col-3 btn btn-success'
@@ -79,6 +88,9 @@ class ProduitFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Produit::class,
+            'allow_file_upload' => true,
+            # Variable 'photo' déclarée par défaut a NULL, cela nous servira pour la modification.
+            'photo' => null,
         ]);
     }
 }
