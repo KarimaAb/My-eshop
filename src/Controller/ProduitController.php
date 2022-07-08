@@ -2,19 +2,19 @@
 
 namespace App\Controller;
 
-use DateTime;
-use Exception;
 use App\Entity\Produit;
 use App\Form\ProduitFormType;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ProduitController extends AbstractController
 {
@@ -72,9 +72,10 @@ class ProduitController extends AbstractController
     public function updateProduit(Produit $produit, EntityManagerInterface $entityManager, SluggerInterface $slugger, Request $request): Response
     {
         $originalPhoto = $produit->getPhoto();
+
         $form = $this->createForm(ProduitFormType::class, $produit, [
-                'photo' => $originalPhoto
-            ])->handleRequest($request);
+            'photo' => $originalPhoto
+        ])->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
 
@@ -84,10 +85,8 @@ class ProduitController extends AbstractController
             $photo = $form->get('photo')->getData();
 
             if ($photo === null) {
-
                $this->handleFile($produit, $photo, $slugger);
-            } # end if($photo)
-            else {
+            } else {
                 $produit->setPhoto($originalPhoto);
             }
 
@@ -105,9 +104,8 @@ class ProduitController extends AbstractController
     } # end function update()
 
     /**
-     * @Route("/archiver-un-produit_(id}", name="soft_delete_produit", methods={"GET"})
+     * @Route("/archiver-un-produit_{id}", name="soft_delete_produit", methods={"GET"})
      */
-
     public function softDeleteProduit(Produit $produit, EntityManagerInterface $entityManager): RedirectResponse
     {
         $produit->setDeletedAt(new DateTime());
@@ -120,19 +118,19 @@ class ProduitController extends AbstractController
     }
 
     /**
-     * @Route("/supprimer-un-produit_(id}", name="hard_delete_produit", methods={"GET"})
+     * @Route("/supprimer-un-produit_{id}", name="hard_delete_produit", methods={"GET"})
      */
     public function hardDeleteProduit(Produit $produit, EntityManagerInterface $entityManager): RedirectResponse
     {
         $entityManager->remove($produit);
         $entityManager->flush();
 
-        $this->addFlash('success', "C'est supprimé");
+        $this->addFlash("success", "Le produit a bien été supprimé de la base");
         return $this->redirectToRoute("show_produits");
     }
 
     /**
-     * @Route("/restaurer-un-produit_(id}", name="restore_produit", methods={"GET"})
+     * @Route("/restaurer-un-produit_{id}", name="restore_produit", methods={"GET"})
      */
     public function restoreProduit(Produit $produit, EntityManagerInterface $entityManager): RedirectResponse
     {
@@ -141,9 +139,13 @@ class ProduitController extends AbstractController
         $entityManager->persist($produit);
         $entityManager->flush();
 
-        $this->addFlash('success', "C'est restauré");
+        $this->addFlash("success", "Le produit a bien été restauré en ligne");
         return $this->redirectToRoute("show_produits");
     }
+
+
+    /////////////////////////////////////////// METHODE PRIVÉE //////////////////////////////////////
+
 
     private function handleFile(Produit $produit, UploadedFile $photo, SluggerInterface $slugger)
     {
@@ -165,7 +167,7 @@ class ProduitController extends AbstractController
         } catch (FileException $exception) {
             $this->addFlash('warning', "Une erreur est survenue pendant l'upload de votre fichier :( Veuillez recommencer.");
             # On redirige le user et notre script s'arretera là si il rentre dans le catch()
-            throw new Exception("Une erreur est survenue pendant l'upload de votre fichier :( Veuillez recommencer");
+            throw new Exception("Une erreur est survenue pendant l'upload de votre fichier :( Veuillez recommencer.");
         }# end catch()
     }
 
